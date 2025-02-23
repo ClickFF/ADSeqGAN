@@ -1,0 +1,26 @@
+utils/
+# data/
+Other_models/
+epoch_data/
+ckpt/
+checkpoints/
+eval_classifier/
+results/
+*.npy
+*.csv
+*.pth
+*.log
+*.pyc
+*.sh
+condi_*.py
+run_and_save.py
+example.py
+condi_GPCR.py
+mol_gen.py
+setup*
+
+!data/train_NAPro.csv
+!data/train_CNS.csv
+!data/train_CNS_3x.csv
+!condi_example.py
+!condi_cns.py
