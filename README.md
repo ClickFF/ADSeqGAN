@@ -26,3 +26,6 @@ python condi_example.py
 ```
 
 You can use `.output_samples` from API to generate molecules from checkpoints.
+
+`.calculate_discriptors.py` is a script to fastly choose RDKit and OpenBabel descriptors which show strongest discrimination power. Please modify Input file and output file paths to use it.
+
