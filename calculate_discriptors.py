@@ -7,13 +7,12 @@ import pandas as pd
 # INPUT AND OUTPUT PATHS - MODIFY THESE AS NEEDED
 # =============================================================================
 
-# Input file path
+# Input file and output file path
 INPUT_CSV_PATH = '/PATH/TO/train.csv'
-INPUT_ENCODING = 'gbk'
-
-# Output file paths
 OUTPUT_DESCRIPTORS_PATH = 'PATH/TO/molecular_descriptors_CNS.csv'
 OUTPUT_AUC_PATH = 'PATH/TO/descriptor_auc_scores_CNS.csv'
+INPUT_ENCODING = 'gbk'
+
 
 # =============================================================================
 
@@ -157,4 +156,5 @@ print(f"\nAUC values calculated and saved to: {OUTPUT_AUC_PATH}")
 print("\nThe top 10 descriptors with the highest discriminative ability:")
 print(auc_df.head(10))
 print(f"\nTotal number of descriptors calculated: {len(auc_df)}")
+
 
