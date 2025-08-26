@@ -9,6 +9,7 @@ from sklearn.metrics import roc_auc_score, roc_curve, auc
 import matplotlib.pyplot as plt
 import joblib
 import os
+from rdkit.Chem import MACCSkeys
 
 # Function to load data
 def classifier_data_loader(filepath):
@@ -16,37 +17,57 @@ def classifier_data_loader(filepath):
     return data
 
 # Function to calculate molecular descriptors
-def calculate_descriptors(smiles_list, descriptor_names:list=None):
-    if descriptor_names is None:
-        descriptor_names = [
-            'NumAromaticRings', 'HallKierAlpha', 'BertzCT', 'PEOE_VSA8', 'VSA_EState6', 'NumAromaticCarbocycles',
-            'SlogP_VSA6', 'SMR_VSA7', 'MolMR', 'BalabanJ', 'fr_bicyclic', 'MinEStateIndex',
-            'Chi1', 'FpDensityMorgan1', 'Chi1n', 'Chi0n', 'LabuteASA', 'Ipc'
-            # 'TPSA', 'NumHDonors', 'NOcount', 'NumHeteroatoms', 'NumHAcceptors', 'VSA_EState3', 'SMR_VSA1', 'MinEStateIndex', 
-            # 'PEOE_VSA1', 'Kappa3', 'ExactMolWt', 'Chi0' 
-            # 'FractionCSP3', 'SMR_VSA5', 'fr_aniline', 'NumAromaticHeterocycles', 'SPS', 'HallKierAlpha', 'SlogP_VSA10',
-            # 'NumHAcceptors', 'TPSA', 'VSA_EState8', 'PEOE_VSA6', 'Chi4n', 'NumSaturatedRings', 'Chi3n', 'Chi4v'
-        ]
-    calculator = MoleculeDescriptors.MolecularDescriptorCalculator(descriptor_names)
-    descriptors = []
-    
-    for smiles in smiles_list:
-        mol = Chem.MolFromSmiles(smiles, sanitize=False)
-        if mol is not None:
-            try:
-                Chem.SanitizeMol(mol, sanitizeOps=Chem.SANITIZE_FINDRADICALS|
-                            Chem.SANITIZE_SETAROMATICITY|
-                            Chem.SANITIZE_SETCONJUGATION|
-                            Chem.SANITIZE_SETHYBRIDIZATION|
-                            Chem.SANITIZE_SYMMRINGS,
-                        catchErrors=True)
-                descriptors.append(calculator.CalcDescriptors(mol))
-            except:
+def calculate_descriptors(smiles_list, descriptor_names:list=None, use_MACCS:bool=True):
+    if use_MACCS == False:
+        if descriptor_names is None:
+            descriptor_names = [
+                'NumAromaticRings', 'HallKierAlpha', 'BertzCT', 'PEOE_VSA8', 'VSA_EState6', 'NumAromaticCarbocycles',
+                'SlogP_VSA6', 'SMR_VSA7', 'MolMR', 'BalabanJ', 'fr_bicyclic', 'MinEStateIndex',
+                'Chi1', 'FpDensityMorgan1', 'Chi1n', 'Chi0n', 'LabuteASA', 'Ipc'
+                # 'TPSA', 'NumHDonors', 'NOcount', 'NumHeteroatoms', 'NumHAcceptors', 'VSA_EState3', 'SMR_VSA1', 'MinEStateIndex', 
+                # 'PEOE_VSA1', 'Kappa3', 'ExactMolWt', 'Chi0' 
+            ]
+        calculator = MoleculeDescriptors.MolecularDescriptorCalculator(descriptor_names)
+        descriptors = []
+        
+        for smiles in smiles_list:
+            mol = Chem.MolFromSmiles(smiles, sanitize=False)
+            if mol is not None:
+                try:
+                    Chem.SanitizeMol(mol, sanitizeOps=Chem.SANITIZE_FINDRADICALS|
+                                Chem.SANITIZE_SETAROMATICITY|
+                                Chem.SANITIZE_SETCONJUGATION|
+                                Chem.SANITIZE_SETHYBRIDIZATION|
+                                Chem.SANITIZE_SYMMRINGS,
+                            catchErrors=True)
+                    descriptors.append(calculator.CalcDescriptors(mol))
+                except:
+                    descriptors.append([np.nan] * len(descriptor_names))
+            else:
                 descriptors.append([np.nan] * len(descriptor_names))
-        else:
-            descriptors.append([np.nan] * len(descriptor_names))
-            
-    return pd.DataFrame(descriptors, columns=descriptor_names)
+                
+        return pd.DataFrame(descriptors, columns=descriptor_names)
+    
+    else:
+        fingerprints = []
+        for smiles in smiles_list:
+            mol = Chem.MolFromSmiles(smiles, sanitize=False)
+            if mol is not None:
+                try:
+                    Chem.SanitizeMol(mol, sanitizeOps=Chem.SANITIZE_FINDRADICALS|
+                                    Chem.SANITIZE_SETAROMATICITY|
+                                    Chem.SANITIZE_SETCONJUGATION|
+                                    Chem.SANITIZE_SETHYBRIDIZATION|
+                                    Chem.SANITIZE_SYMMRINGS,
+                                catchErrors=True)
+                    fp = MACCSkeys.GenMACCSKeys(mol)
+                    arr = np.array(list(fp.ToBitString()), dtype=int)
+                    fingerprints.append(arr)
+                except:
+                    fingerprints.append([0]*167)
+            else:
+                fingerprints.append([0]*167)
+        return pd.DataFrame(fingerprints)
 
 # Function to train the model
 def model_training(X, y):
