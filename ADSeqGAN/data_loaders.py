@@ -92,11 +92,12 @@ class Dis_Dataloader():
         """
         data = list(data)  # Convert zip object to list to get its length
         data_size = len(data)
-        num_batches_per_epoch = int(len(data) / batch_size) + 1
+        num_batches_per_epoch = int(len(data) / batch_size) + (1 if len(data) % batch_size != 0 else 0)
         for epoch in range(num_epochs):
             # Shuffle the data at each epoch
             np.random.shuffle(data)
             for batch_num in range(num_batches_per_epoch):
                 start_index = batch_num * batch_size
                 end_index = min((batch_num + 1) * batch_size, data_size)
-                yield data[start_index:end_index]
+                if start_index < data_size:
+                    yield data[start_index:end_index]
