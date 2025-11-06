@@ -29,3 +29,23 @@ You can use `.output_samples` from API to generate molecules from checkpoints.
 
 `.calculate_discriptors.py` is a script to fastly choose RDKit and OpenBabel descriptors which show strongest discrimination power. Please modify Input file and output file paths to use it.
 
+If you use ADSeqGAN in your research, please cite:
+
+```bibtex
+@article{doi:10.1021/acs.jcim.5c01737,
+	journal = {Journal of Chemical Information and Modeling},
+	doi = {10.1021/acs.jcim.5c01737},
+	issn = {1549-9596},
+	number = {19},
+	publisher = {American Chemical Society (ACS)},
+	title = {Auxiliary Discrminator Sequence Generative Adversarial Networks for Few Sample Molecule Generation},
+	volume = {65},
+	author = {Tang, Haocheng and Long, Jing and Ji, Beihong and Wang, Junmei},
+	note = {[Online; accessed 2025-11-06]},
+	pages = {10311--10322},
+	date = {2025-09-22},
+	year = {2025},
+	month = {9},
+	day = {22},
+}
+```
